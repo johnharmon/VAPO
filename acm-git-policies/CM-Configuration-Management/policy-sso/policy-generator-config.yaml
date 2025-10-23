@@ -1,0 +1,27 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: PolicyGenerator
+metadata:
+  name: policy-sso
+policyDefaults:
+  namespace: acm-dcce-polices
+  placement:
+    clusterSelector:
+      matchExpressions:
+      - key: managed-by
+        operator: In
+        values:
+        - "dcce"
+  remediationAction: inform
+  severity: medium
+policies:
+  - name: policy-sso
+    manifests:
+      - path: ldap-group-sync/
+      - path: individual/
+      - path: openid-client-secret-entraid.yaml
+      - path: openid-client-secret-iam.yaml
+      - path: openid-ca.yaml
+      - path: oauth-cluster.yaml
+    
+      
+

@@ -1,0 +1,21 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: PolicyGenerator
+metadata:
+  name: policy-project-template
+policyDefaults:
+  namespace: acm-dcce-polices
+  placement:
+    clusterSelector:
+      matchExpressions:
+      - key: managed-by
+        operator: In
+        values:
+        - "vapo"
+        - "cle"
+  remediationAction: enforce  
+  severity: medium
+policies:
+  - name: policy-project-template
+    manifests:
+      - path: template.yaml
+      - path: project-config.yaml

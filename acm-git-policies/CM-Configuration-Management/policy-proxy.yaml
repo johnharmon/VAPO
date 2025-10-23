@@ -1,0 +1,61 @@
+apiVersion: apps.open-cluster-management.io/v1
+kind: PlacementRule
+metadata:
+  name: placement-policy-proxy-ca
+  namespace: acm-dcce-polices
+spec:
+  clusterConditions:
+  - status: "True"
+    type: ManagedClusterConditionAvailable
+  clusterSelector:
+    matchExpressions:
+    - key: vapomanaged
+      operator: In
+###      values:
+###      - true
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: binding-policy-proxy-ca
+  namespace: acm-dcce-polices
+placementRef:
+  apiGroup: apps.open-cluster-management.io
+  kind: PlacementRule
+  name: placement-policy-proxy-ca
+subjects:
+- apiGroup: policy.open-cluster-management.io
+  kind: Policy
+  name: policy-proxy-ca
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  name: policy-proxy-ca
+  namespace: acm-dcce-polices
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-proxy-ca
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: config.openshift.io/v1
+            kind: Proxy
+            metadata:
+              name: cluster
+            spec:
+              trustedCA:
+                name: user-ca-bundle
+            status: {}
+        remediationAction: enforce
+        severity: medium

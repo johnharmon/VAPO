@@ -1,0 +1,75 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: checkfipscompliance
+  namespace: acm-dcce-polices
+  annotations:
+    policy.open-cluster-management.io/categories: PR.IP Information Protection Processes and Procedures
+    policy.open-cluster-management.io/controls: PR.IP-1 Baseline Configuration
+    policy.open-cluster-management.io/standards: NIST-CSF
+spec:
+  disabled: false
+  policy-templates:
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: checkfipscompliance
+        spec:
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: machineconfiguration.openshift.io/v1
+                kind: MachineConfig
+                metadata:
+                  name: 99-worker-fips
+                  labels:
+                    machineconfiguration.openshift.io/role: worker
+                spec:
+                  fips: true
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: machineconfiguration.openshift.io/v1
+                kind: MachineConfig
+                metadata:
+                  name: 99-master-fips
+                  labels:
+                    machineconfiguration.openshift.io/role: master
+                spec:
+                  fips: true
+          remediationAction: inform
+          severity: low
+  remediationAction: inform
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: PlacementRule
+metadata:
+  name: placement-checkfipscompliance
+  namespace: acm-dcce-polices
+  annotations:
+    open-cluster-management.io/user-group: c3lzdGVtOmF1dGhlbnRpY2F0ZWQ6b2F1dGgsc3lzdGVtOmF1dGhlbnRpY2F0ZWQ=
+    open-cluster-management.io/user-identity: dmFhYWNmYXNjaW0=
+spec:
+  clusterConditions:
+    - status: "True"
+      type: ManagedClusterConditionAvailable
+  clusterSelector:
+    labelSelector:
+      matchExpressions:
+#      - {key: vendor, operator: In, values: ["OpenShift"]}
+      - {key: vapomanaged, operator: In, values: ["false"]}
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: binding-checkfipscompliance
+  namespace: acm-dcce-polices
+placementRef:
+  name: placement-checkfipscompliance
+  apiGroup: apps.open-cluster-management.io
+  kind: PlacementRule
+subjects:
+  - name: checkfipscompliance
+    apiGroup: policy.open-cluster-management.io
+    kind: Policy
+

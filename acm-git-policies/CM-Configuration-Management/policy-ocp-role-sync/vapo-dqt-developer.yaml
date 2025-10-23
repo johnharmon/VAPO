@@ -1,0 +1,152 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: vapo-dqt-developer
+rules:
+  - verbs:
+      - get
+      - list
+      - watch
+    apiGroups:
+      - ''
+      - project.openshift.io
+      - rbac.authorization.k8s.io
+    resources:
+      - projects
+      - namespaces
+      - roles
+      - rolebindings
+  - verbs:
+      - get
+      - list
+      - watch
+      - create
+      - delete
+      - patch
+    apiGroups:
+      - monitoring.coreos.com
+      - servicemonitors.monitoring.coreos.com
+    resources:
+      - servicemonitors
+  - verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+      - create
+      - delete
+    apiGroups:
+      - elasticsearch.k8s.elastic.co
+      - rabbitmq.com
+    resources:
+      - '*'
+  - verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+      - create
+      - delete
+    apiGroups:
+      - ''
+      - policy
+    resources:
+      - persistentvolumeclaims
+      - persistentvolumes
+      - poddisruptionbudgets
+  - verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+      - create
+      - delete
+    apiGroups:
+      - ''
+      - workspace.devfile.io
+      - image.openshift.io
+      - batch
+      - apps
+    resources:
+      - jobs
+      - cronjobs
+      - secrets
+      - configmaps
+      - pods
+      - serviceaccounts
+      - services
+      - devworkspaces
+      - pods/exec
+      - pods/log
+      - imagestreams
+      - statefulsets
+  - verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+      - create
+      - delete
+    apiGroups:
+      - build.openshift.io
+      - route.openshift.io
+      - tekton.dev
+      - triggers.tekton.dev
+      - apps.openshift.io
+      - apps
+      - networking.k8s.io
+      - autoscaling
+    resources:
+      - builds
+      - buildconfigs
+      - buildconfigs/instantiate
+      - builds/log
+      - routes
+      - pipelines
+      - tasks
+      - triggerbindings
+      - triggertemplates
+      - eventlisteners
+      - deployments
+      - deploymentconfigs
+      - pipelineruns
+      - pipelineresources
+      - conditions
+      - replicasets
+      - ingresses
+      - horizontalpodautoscalers
+  - verbs:
+      - get
+      - list
+      - watch
+    apiGroups:
+      - operators.coreos.com
+    resources:
+      - clusterserviceversions
+  - verbs:
+      - create
+    apiGroups:
+      - route.openshift.io
+    resources:
+      - '*'
+  - verbs:
+      - delete
+      - create
+      - patch
+    apiGroups:
+      - rbac.authorization.k8s.io
+    resources:
+      - roles
+      - rolebindings
+  - verbs:
+      - get
+      - list
+      - watch
+    apiGroups:
+      - secscan.quay.redhat.com
+    resources:
+      - imagemanifestvulns 

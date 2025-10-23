@@ -1,0 +1,188 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: vapo-in-house-developer
+rules:
+  - verbs:
+      - get
+      - list
+      - watch
+    apiGroups:
+      - ''
+      - project.openshift.io
+      - rbac.authorization.k8s.io
+    resources:
+      - projects
+      - namespaces
+      - roles
+      - rolebindings
+  - verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+      - create
+      - delete
+    apiGroups:
+      - ''
+      - workspace.devfile.io
+      - image.openshift.io
+    resources:
+      - secrets
+      - configmaps
+      - pods
+      - serviceaccounts
+      - services
+      - devworkspaces
+      - pods/exec
+      - pods/log
+      - pods/attach
+      - imagestreams
+      - imagestreammappings
+      - imagestreamimports
+      - imagestreamimages
+      - imagestreamtags
+      - imagetags
+      - imagestreams/secrets
+      - imagestreams/layers
+      - imagestreams/status
+  - verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+      - create
+      - delete
+    apiGroups:
+      - build.openshift.io
+      - route.openshift.io
+      - tekton.dev
+      - triggers.tekton.dev
+      - apps.openshift.io
+      - apps
+      - networking.k8s.io
+      - autoscaling
+    resources:
+      - builds
+      - buildconfigs
+      - buildconfigs/instantiate
+      - builds/log
+      - routes
+      - pipelines
+      - tasks
+      - taskruns
+      - triggerbindings
+      - triggertemplates
+      - eventlisteners
+      - deployments
+      - deploymentconfigs
+      - pipelineruns
+      - pipelineresources
+      - conditions
+      - replicasets
+      - ingresses
+      - horizontalpodautoscalers
+      - routes/custom-host
+  - verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+      - create
+      - delete
+    apiGroups:
+      - tekton.dev
+      - triggers.tekton.dev
+      - eventing.knative.dev
+    resources:
+      - '*'
+  - verbs:
+      - '*'
+    apiGroups:
+      - ''
+    resources:
+      - persistentvolumeclaims
+      - persistentvolumeclaims/status
+  - verbs:
+      - '*'
+    apiGroups:
+      - 'objectbucket.io'
+    resources:
+      - objectbucketclaims
+      - objectbucketclaims/status
+  - verbs:
+      - get
+      - watch
+      - list
+      - create
+    apiGroups:
+      - apps.open-cluster-management.io
+    resources:
+      - deployables
+  - verbs:
+      - get
+      - watch
+      - list
+      - create
+      - delete
+    apiGroups:
+      - cert-manager.io
+    resources:
+      - certificates
+      - certificaterequests
+  - verbs:
+      - get
+      - watch
+      - list
+    apiGroups:
+      - operators.coreos.com
+    resources:
+      - '*'
+      - clusterserviceversions
+  - verbs:
+      - watch
+    apiGroups:
+      - ''
+    resources:
+      - events
+  - verbs:
+      - get
+      - watch
+      - list
+    apiGroups:
+      - keda.sh
+    resources:
+      - '*' 
+  - verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+      - create
+      - delete
+    apiGroups:
+      - batch
+    resources:     
+      - cronjobs
+      - jobs
+  - verbs:
+      - get
+      - list
+      - watch
+    apiGroups:
+      - secscan.quay.redhat.com
+    resources:
+      - imagemanifestvulns
+  - verbs:
+      - get
+      - watch
+      - list
+    apiGroups:
+      - ''
+    resources:
+      - resourcequotas
+      - limitranges

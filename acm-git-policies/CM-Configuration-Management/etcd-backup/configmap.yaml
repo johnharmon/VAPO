@@ -1,0 +1,28 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: etcd-backup-script
+  namespace: default
+data:
+  etcd-backup.sh: |
+    #!/bin/sh
+
+    DATE=$(date +%Y%m%dT%H%M%S)
+
+    if [ ! -d /host/home/core/backup/etcd-backup ]; then mkdir /host/home/core/backup/etcd-backup; fi
+
+    rm -i /host/home/core/backup/etcd-backup/** -f
+
+    chroot /host sudo -E /usr/local/bin/cluster-backup.sh /home/core/backup/etcd-backup
+
+    if [ $? -eq 0 ]; then
+        mkdir /home/core/backup/${DATE}
+        cp -r /host/home/core/backup/etcd-backup/  /home/core/backup/${DATE}/
+        echo 'Copied backup files to PVC mount point.'
+        
+        exit 0
+    fi
+
+    echo "Backup attempts failed. Please FIX !!!"
+
+    exit 1

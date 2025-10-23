@@ -1,0 +1,79 @@
+kind: CronJob
+apiVersion: batch/v1
+metadata:
+  name: cronjob-etcd-backup
+  namespace: default
+  labels:
+    purpose: etcd-backup
+spec:
+  schedule: 0 */6 * * *
+  startingDeadlineSeconds: 200
+  concurrencyPolicy: Forbid
+  suspend: false
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          nodeSelector:
+            node-role.kubernetes.io/master: ''
+          restartPolicy: Never
+          activeDeadlineSeconds: 200
+          serviceAccountName: approver
+          schedulerName: default-scheduler
+          hostNetwork: true
+          terminationGracePeriodSeconds: 30
+          securityContext: {}
+          containers:
+            - resources:
+                requests:
+                  cpu: 300m
+                  memory: 250Mi
+              terminationMessagePath: /dev/termination-log
+              name: etcd-backup
+              command:
+                - /bin/sh
+                - '-c'
+                - usr/local/bin/etcd-backup.sh && cd /home/core/backup && ls -1 | sort -r | tail -n +6 | xargs rm -rf > /dev/null 2>&1
+              securityContext:
+                privileged: true
+              imagePullPolicy: IfNotPresent
+              volumeMounts:
+                - name: host
+                  mountPath: /host
+                - name: etcd-backup-script
+                  mountPath: /usr/local/bin/etcd-backup.sh
+                  subPath: etcd-backup.sh
+                - name: etcd-backup
+                  mountPath: /home/core/backup
+                - name: scripts
+                  mountPath: /usr/local/bin
+              terminationMessagePolicy: FallbackToLogsOnError
+              image: registry.redhat.io/openshift4/ose-cli
+          serviceAccount: approver
+          volumes:
+            - name: etcd-backup-script
+              configMap:
+                name: etcd-backup-script
+                defaultMode: 493
+            - name: host
+              hostPath:
+                path: /
+                type: Directory
+            - name: scripts
+              hostPath:
+                path: /usr/local/bin
+                type: ''
+            - name: etcd-backup
+              persistentVolumeClaim:
+                claimName: etcd-backup
+          dnsPolicy: ClusterFirst
+          tolerations:
+            - operator: Exists
+              effect: NoSchedule
+            - operator: Exists
+              effect: NoExecute

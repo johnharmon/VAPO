@@ -1,0 +1,83 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: policy-enableclusterlogforwarder
+  namespace: acm-dcce-polices
+  annotations:
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+spec:
+  disabled: true
+  policy-templates:
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: policy-enableclusterlogforwarder
+        spec:
+          namespaceSelector:
+            exclude:
+              - kube-*
+            include:
+              - default
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: logging.openshift.io/v1
+                kind: ClusterLogForwarder
+                metadata:
+                  name: instance
+                  namespace: openshift-logging
+                spec:
+                  outputs:
+                    - name: audit-logs
+                      type: kafka
+                      url: http://my-cluster-kafka-bootstrap.openshift-operators.svc:9092/{{
+                        fromSecret "open-cluster-management-agent"
+                        "hub-kubeconfig-secret" "cluster-name" | base64dec
+                        }}audit-topic
+                  pipelines:
+                    - name: audit-topic
+                      inputRefs:
+                        - audit
+                      outputRefs:
+                        - audit-logs
+                        - default
+          remediationAction: inform
+          severity: low
+  remediationAction: inform
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: PlacementRule
+metadata:
+  name: placement-policy-enableclusterlogforwarder
+  namespace: acm-dcce-polices
+  annotations:
+    open-cluster-management.io/user-group: c3lzdGVtOmNsdXN0ZXItYWRtaW5zLHN5c3RlbTphdXRoZW50aWNhdGVk
+    open-cluster-management.io/user-identity: a3ViZTphZG1pbg==
+spec:
+  clusterConditions:
+    - status: "True"
+      type: ManagedClusterConditionAvailable
+  clusterSelector:
+    matchExpressions:
+      - key: vapomanaged
+        operator: In
+###        values:
+###          - true
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: binding-policy-enableclusterlogforwarder
+  namespace: acm-dcce-polices
+placementRef:
+  name: placement-policy-enableclusterlogforwarder
+  apiGroup: apps.open-cluster-management.io
+  kind: PlacementRule
+subjects:
+  - name: policy-enableclusterlogforwarder
+    apiGroup: policy.open-cluster-management.io
+    kind: Policy
+

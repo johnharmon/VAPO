@@ -1,0 +1,23 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: PolicyGenerator
+metadata:
+  name: policy-namespace-opr
+policyDefaults:
+  namespace: acm-dcce-polices
+  placement:
+    clusterSelectors:
+      matchExpressions:
+      - key: managed-by
+        operator: In
+        values:
+        - vapo
+        - cle
+  remediationAction: enforce
+  severity: medium
+policies:
+  - name: policy-namespace-opr
+    manifests:
+      - path: namespace-opr-install.yaml
+      - path: configs/
+
+

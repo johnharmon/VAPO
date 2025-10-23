@@ -1,0 +1,12 @@
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: csi-rbdplugin
+  namespace: openshift-storage
+spec:
+  template:
+    spec:
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule

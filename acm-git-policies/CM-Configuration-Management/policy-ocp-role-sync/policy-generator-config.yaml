@@ -1,0 +1,22 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: PolicyGenerator
+metadata:
+  name: policy-ocp-role-sync
+policyDefaults:
+  namespace: acm-dcce-polices
+  placement:
+    clusterSelector:
+      matchExpressions:
+      - key: name
+        operator: In
+        values:
+        - aws-sbx
+        - local-cluster
+  remediationAction: enforce
+  severity: medium
+policies:
+  - name: policy-ocp-role-sync
+    manifests:
+      - path: vapo-in-house-developer.yaml
+      - path: vapo-dqt-developer.yaml
+      - path: vapo-product-developer.yaml

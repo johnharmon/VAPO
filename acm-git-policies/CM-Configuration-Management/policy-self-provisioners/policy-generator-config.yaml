@@ -1,0 +1,21 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: PolicyGenerator
+metadata:
+  name: self-provisioners
+policyDefaults:
+  namespace: acm-dcce-polices
+  placement:
+    clusterSelector:
+      matchExpressions:
+      - key: managed-by
+        operator: In
+        values:
+        - "vapo"
+        - "cle"
+        - "valip"
+  remediationAction: enforce
+  severity: medium
+policies:
+  - name: self-provisioners
+    manifests:
+      - path: self-provisioners.yaml

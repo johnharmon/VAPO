@@ -1,0 +1,22 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: PolicyGenerator
+metadata:
+  name: policy-login-banner-kubeadmin-removal
+policyDefaults:
+  namespace: acm-dcce-polices
+  placement:
+    clusterSelector:
+      matchExpressions:
+      - key: managed-by
+        operator: In
+        values:
+        - vapo
+  remediationAction: inform
+  severity: medium
+policies:
+  - name: policy-login-banner-kubeadmin-removal
+    manifests:
+      - path: providers01-template-secret.yaml
+      - path: oauth-cluster.yaml
+      - path: scrt-adfs-sbx.yaml
+      - path: openid-ca-adfs.yaml

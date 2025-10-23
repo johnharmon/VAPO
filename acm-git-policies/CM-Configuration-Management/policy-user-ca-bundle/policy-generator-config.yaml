@@ -1,0 +1,19 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: PolicyGenerator
+metadata:
+  name: user-ca-bundle
+policyDefaults:
+  namespace: acm-dcce-polices
+  placement:
+    clusterSelector:
+      matchExpressions:
+      - key: managed-by
+        operator: In
+        values:
+        - "dcce"
+  remediationAction: enforce
+  severity: medium
+policies:
+  - name: user-ca-bundle-policy
+    manifests:
+      - path: user-ca-bundle.yaml

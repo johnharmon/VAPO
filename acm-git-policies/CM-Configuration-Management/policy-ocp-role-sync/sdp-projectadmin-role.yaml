@@ -1,0 +1,17 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: sdp-projectadmin-role
+rules:
+  - verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+      - create
+      - delete
+    apiGroups:
+      - ''
+    resources:     
+      - namespaces

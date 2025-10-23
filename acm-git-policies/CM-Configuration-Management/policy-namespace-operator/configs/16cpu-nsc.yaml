@@ -1,0 +1,32 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: ConfigurationPolicy
+metadata:
+  name: 16cpu 
+spec:
+  remediationAction: enforce # will be overridden by remediationAction in parent policy
+  severity: low
+  object-templates:
+    - complianceType: mustonlyhave
+      objectDefinition:
+        apiVersion: redhatcop.redhat.io/v1alpha1
+        kind: NamespaceConfig
+        metadata:
+          name: 16cpu 
+        spec:
+          labelSelector:
+            matchLabels:
+              cpu: 16cpu
+          templates:
+            - excludedPaths:
+                - .spec.replicas
+                - .metadata
+                - .status
+              objectTemplate: |
+                apiVersion: v1
+                kind: ResourceQuota
+                metadata:
+                  name: 16cpu
+                  namespace: {{ `{{ .Name }}` }}
+                spec:
+                  hard:
+                    cpu: "16"

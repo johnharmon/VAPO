@@ -1,0 +1,20 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: PolicyGenerator
+metadata:
+  name: vertical-pod
+policyDefaults:
+  namespace: acm-dcce-polices
+  placement:
+    clusterSelector:
+      matchExpressions:
+      - key: name
+        operator: In
+        values:
+        - "local-cluster"
+        - "dcce-virt-poc"
+  remediationAction: enforce
+  severity: low
+policies:
+  - name: vertical-pod
+    manifests:
+      - path: vpod-install.yaml

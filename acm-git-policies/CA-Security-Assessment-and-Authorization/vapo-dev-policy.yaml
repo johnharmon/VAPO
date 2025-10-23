@@ -1,0 +1,130 @@
+apiVersion: apps.open-cluster-management.io/v1
+kind: PlacementRule
+metadata:
+  name: placement-vapo-dev-policy
+  namespace: acm-dcce-polices
+spec:
+  clusterConditions:
+  - status: "True"
+    type: ManagedClusterConditionAvailable
+  clusterSelector:
+    matchExpressions:
+    - key: name
+      operator: In
+      values:
+      - local-cluster
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: binding-vapo-dev-policy
+  namespace: acm-dcce-polices
+placementRef:
+  apiGroup: apps.open-cluster-management.io
+  kind: PlacementRule
+  name: placement-vapo-dev-policy
+subjects:
+- apiGroup: policy.open-cluster-management.io
+  kind: Policy
+  name: vapo-dev-policy
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  name: vapo-dev-policy
+  namespace: acm-dcce-polices
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: vapo-dev-policy
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: rbac.authorization.k8s.io/v1
+            kind: ClusterRole
+            metadata:
+              name: vapo-in-house-developer
+            rules:
+            - apiGroups:
+              - ""
+              - project.openshift.io
+              - rbac.authorization.k8s.io
+              resources:
+              - projects
+              - namespaces
+              - roles
+              - rolebindings
+              verbs:
+              - get
+              - list
+              - watch
+            - apiGroups:
+              - ""
+              - workspace.devfile.io
+              - image.openshift.io
+              resources:
+              - secrets
+              - configmaps
+              - pods
+              - serviceaccounts
+              - services
+              - devworkspaces
+              - pods/exec
+              - pods/log
+              - imagestreams
+              verbs:
+              - get
+              - list
+              - watch
+              - update
+              - patch
+              - create
+              - delete
+            - apiGroups:
+              - build.openshift.io
+              - route.openshift.io
+              - tekton.dev
+              - triggers.tekton.dev
+              - apps.openshift.io
+              - apps
+              - networking.k8s.io
+              - autoscaling
+              resources:
+              - builds
+              - buildconfigs
+              - buildconfigs/instantiate
+              - builds/log
+              - routes
+              - pipelines
+              - tasks
+              - triggerbindings
+              - triggertemplates
+              - eventlisteners
+              - deployments
+              - deploymentconfigs
+              - pipelineruns
+              - pipelineresources
+              - conditions
+              - replicasets
+              - ingresses
+              - horizontalpodautoscalers
+              - routes/custom-host
+              verbs:
+              - get
+              - list
+              - watch
+              - update
+              - patch
+              - create
+              - delete
+        remediationAction: enforce
+        severity: medium

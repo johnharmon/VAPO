@@ -1,0 +1,15 @@
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: namespace-configuration-operator
+spec:
+  remediationAction: enforce
+  severity: low
+  complianceType: musthave
+  upgradeApproval: Automatic
+  subscription:
+    channel: alpha
+    name: namespace-configuration-operator
+    namespace: namespace-configuration-operator
+    source: community-operators
+    sourceNamespace: openshift-marketplace

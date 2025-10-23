@@ -1,0 +1,36 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: ldap-group-syncer-resourceadmin-va-gov
+  namespace: ldap-sync
+data:
+  sync.yaml: |-
+    kind: LDAPSyncConfig
+    apiVersion: v1
+    url: ldap://vac101dc1va.va.gov:3268
+    insecure: false
+    bindDN: "CN=vac10pioocpldapsbx,OU=Service Accounts,OU=AWS,OU=VAEC,DC=va,DC=gov"
+    bindPassword:
+      file: "/etc/secrets/bindPassword"
+    ca: /etc/ldap-ca/ca-bundle.crt
+    rfc2307:
+      groupsQuery:
+        baseDN: "OU=ResourceAdmins,OU=Security,OU=Management Groups,DC=va,DC=gov"
+        scope: sub
+        filter: "(info=*vapo-rbac*)"
+        derefAliases: never
+        pageSize: 0
+        timeout: 0
+      groupUIDAttribute: dn
+      groupNameAttributes: [ cn ]
+      groupMembershipAttributes: [ member ]
+      usersQuery:
+        baseDN: DC=va,DC=gov
+        scope: sub
+        derefAliases: never
+        pageSize: 0
+        timeout: 0
+      userUIDAttribute: dn
+      userNameAttributes: [ mail,sAMAccountName ]
+      tolerateMemberNotFoundErrors: true
+      tolerateMemberOutOfScopeErrors: true

@@ -1,0 +1,32 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: ConfigurationPolicy
+metadata:
+  name: 32gi 
+spec:
+  remediationAction: enforce # will be overridden by remediationAction in parent policy
+  severity: low
+  object-templates:
+    - complianceType: mustonlyhave
+      objectDefinition:
+        apiVersion: redhatcop.redhat.io/v1alpha1
+        kind: NamespaceConfig
+        metadata:
+          name: 32gi 
+        spec:
+          labelSelector:
+            matchLabels:
+              mem: 32gi
+          templates:
+            - excludedPaths:
+                - .spec.replicas
+                - .metadata
+                - .status
+              objectTemplate: |
+                apiVersion: v1
+                kind: ResourceQuota
+                metadata:
+                  name: 32gi
+                  namespace: {{ `{{ .Name }}` }}
+                spec:
+                  hard:
+                    memory: 32Gi

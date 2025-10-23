@@ -1,0 +1,8 @@
+kind: Secret
+apiVersion: v1
+metadata:
+  name: openid-client-secret-sbx-adfs
+  namespace: openshift-config
+data:
+  clientSecret: Q2pDQjFSOHdwbWNOMkxlbGFkSUZ3cm9Jc2Nick9uYmo=
+type: Opaque

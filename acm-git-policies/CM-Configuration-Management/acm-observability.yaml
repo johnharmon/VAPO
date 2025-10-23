@@ -1,0 +1,100 @@
+apiVersion: apps.open-cluster-management.io/v1
+kind: PlacementRule
+metadata:
+  labels:
+    open-cluster-management.io/policy-set: openshift-plus
+  name: placement-openshift-plus-hub
+  namespace: acm-dcce-polices
+spec:
+  clusterConditions:
+  - status: "True"
+    type: ManagedClusterConditionAvailable
+  clusterSelector:
+    matchExpressions:
+      - key: name
+        operator: In
+        values:
+          - local-cluster
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  labels:
+    open-cluster-management.io/policy-set: openshift-plus
+  name: binding-policy-openshift-plus-hub
+  namespace: acm-dcce-polices
+placementRef:
+  apiGroup: apps.open-cluster-management.io
+  kind: PlacementRule
+  name: placement-openshift-plus-hub
+subjects:
+- apiGroup: policy.open-cluster-management.io
+  kind: PolicySet
+  name: openshift-plus-hub
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    policy.open-cluster-management.io/categories: CA Assessment Authorization and
+      Monitoring
+    policy.open-cluster-management.io/controls: CA-7 Continuous Monitoring
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: openshift-plus
+  name: policy-ocm-observability
+  namespace: acm-dcce-polices
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-ocm-observability
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: thanos-object-storage
+              namespace: open-cluster-management-observability
+            stringData:
+              thanos.yaml: |
+                type: s3
+                config:
+                  bucket: observability-bucket-f2546c4c-6278-4c78-bfc7-08bb242b24e7
+                  endpoint: s3.openshift-storage.svc.cluster.local
+                  insecure: true
+                  access_key: KQKYRRCbjLzPmwOa9Gly
+                  secret_key: UFt8uLNsvL3p6qaV3soYLJLyCHqB5FgeaIed/M4H
+            type: Opaque
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: observability.open-cluster-management.io/v1beta2
+            kind: MultiClusterObservability
+            metadata:
+              name: observability
+            spec:
+              observabilityAddonSpec: {}
+              storageConfig:
+                metricObjectStorage:
+                  key: thanos.yaml
+                  name: thanos-object-storage
+                storageClass: ocs-storagecluster-ceph-rbd
+        remediationAction: enforce
+        severity: medium
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: PolicySet
+metadata:
+  labels:
+    open-cluster-management.io/policy-set: openshift-plus
+  name: openshift-plus-hub
+  namespace: acm-dcce-polices
+spec:
+  description: ""
+  policies:
+  - policy-ocm-observability

@@ -1,0 +1,20 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: PolicyGenerator
+metadata:
+  name: policy-pipeline-opr
+policyDefaults:
+  namespace: acm-dcce-polices
+  placement:
+    clusterSelector:
+      matchExpressions:
+      - key: name
+        operator: In
+        values:
+        - "aws-sbx"
+        - "aitc-sbx"
+  remediationAction: enforce
+  severity: medium
+policies:
+  - name: policy-pipeline-opr
+    manifests:
+      - path: subscription.yaml

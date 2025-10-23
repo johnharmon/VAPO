@@ -1,0 +1,17 @@
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: csi-cephfsplugin
+  namespace: openshift-storage
+spec:
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: csi-cephfsplugin
+        contains: csi-cephfsplugin-metrics
+    spec:
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule

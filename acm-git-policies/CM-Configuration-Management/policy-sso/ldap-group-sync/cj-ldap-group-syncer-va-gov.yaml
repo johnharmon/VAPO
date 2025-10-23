@@ -1,0 +1,60 @@
+kind: CronJob
+apiVersion: batch/v1
+metadata:
+  name: ldap-group-syncer-va-gov
+  namespace: ldap-sync
+spec:
+  schedule: '* */12 * * *'
+  concurrencyPolicy: Forbid
+  suspend: false
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          restartPolicy: Never
+          activeDeadlineSeconds: 1000
+          serviceAccountName: ldap-group-syncer
+          schedulerName: default-scheduler
+          terminationGracePeriodSeconds: 30
+          securityContext: {}
+          containers:
+            - name: ldap-group-sync
+              image: 'quay.vapo.va.gov/vapo_tst_images/ose-cli-jq:latest'
+              command:
+                - /bin/bash
+                - '-c'
+                - oc adm groups sync --sync-config=/etc/config/sync.yaml --confirm
+              resources: {}
+              volumeMounts:
+                - name: ldap-sync-volume
+                  mountPath: /etc/config
+                - name: ldap-bind-password
+                  mountPath: /etc/secrets
+                - name: ldap-ca
+                  mountPath: /etc/ldap-ca
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              imagePullPolicy: Always
+          serviceAccount: ldap-group-syncer
+          volumes:
+            - name: ldap-sync-volume
+              configMap:
+                name: ldap-group-syncer-va-gov
+                defaultMode: 420
+            - name: ldap-bind-password
+              secret:
+                secretName: ldap-secret
+                defaultMode: 420
+            - name: ldap-ca
+              configMap:
+                name: config-trusted-cabundle
+                defaultMode: 420
+          dnsPolicy: ClusterFirst
+      ttlSecondsAfterFinished: 1800
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1

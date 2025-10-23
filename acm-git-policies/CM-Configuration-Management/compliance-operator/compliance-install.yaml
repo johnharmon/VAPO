@@ -1,0 +1,15 @@
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: compliance-install
+spec:
+  remediationAction: enforce
+  severity: low
+  complianceType: musthave
+  upgradeApproval: Automatic
+  subscription:
+    channel: stable
+    name: compliance-operator
+    namespace: openshift-compliance
+    source: redhat-operators
+    sourceNamespace: openshift-marketplace

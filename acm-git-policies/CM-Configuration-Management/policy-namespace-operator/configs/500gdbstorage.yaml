@@ -1,0 +1,32 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: ConfigurationPolicy
+metadata:
+  name: 500gdbstorage 
+spec:
+  remediationAction: enforce # will be overridden by remediationAction in parent policy
+  severity: low
+  object-templates:
+    - complianceType: mustonlyhave
+      objectDefinition:
+        apiVersion: redhatcop.redhat.io/v1alpha1
+        kind: NamespaceConfig
+        metadata:
+          name: 500gdbstorage
+        spec:
+          labelSelector:
+            matchLabels:
+              storagesize: 500gdbstorage
+          templates:
+            - excludedPaths:
+                - .spec.replicas
+                - .metadata
+                - .status
+              objectTemplate: |
+                apiVersion: v1
+                kind: ResourceQuota
+                metadata:
+                  name: 500gdbstorage
+                  namespace: {{ `{{ .Name }}` }}
+                spec:
+                  hard:
+                    requests.storage: 500Gi

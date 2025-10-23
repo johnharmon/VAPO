@@ -1,0 +1,63 @@
+apiVersion: config.openshift.io/v1
+kind: OAuth
+metadata:
+  name: cluster
+spec:
+  identityProviders:
+    - mappingMethod: add
+      name: sso
+      openID:
+        ca:
+          name: openid-ca-sso
+        claims:
+          email:
+            - email
+          name:
+            - name
+          preferredUsername:
+            - preferred_username
+        clientID: openshift
+        clientSecret:
+          name: openid-client-secret-sso
+        extraScopes: []
+        issuer: 'https://keycloak-sso-aitc.apps.vapo-aitc-gss.va.gov/auth/realms/sso'
+      type: OpenID
+    - mappingMethod: add
+      name: piv
+      openID:
+        ca:
+          name: openid-ca-piv
+        claims:
+          email:
+            - email
+          name:
+            - name
+          preferredUsername:
+            - preferred_username
+        clientID: piv
+        clientSecret:
+          name: openid-client-secret-piv
+        extraScopes: []
+        issuer: 'https://keycloak-sso-aws.apps.vapo.va.gov/auth/realms/iam'
+      type: OpenID
+    - mappingMethod: add
+      name: adfs-test
+      openID:
+        ca:
+          name: openid-ca-pnkfw
+        claims:
+          email:
+            - email
+          name:
+            - name
+          preferredUsername:
+            - preferred_username
+        clientID: openshift-oidc
+        clientSecret:
+          name: openid-client-secret-sbx-adfs
+        extraScopes: []
+        issuer: 'https://keycloak.apps.vapo-sbx.va.gov/realms/adfs'
+      type: OpenID
+  templates:
+    providerSelection:
+      name: providers01-template

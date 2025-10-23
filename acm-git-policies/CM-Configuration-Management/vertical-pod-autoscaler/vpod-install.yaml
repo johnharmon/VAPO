@@ -1,0 +1,20 @@
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: vpod-autoscaler
+spec:
+  operatorGroup: # optional
+    namespace: openshift-vertical-pod-autoscaler
+    name: vpod-og
+    targetNamespaces:
+        - openshift-vertical-pod-autoscaler
+  remediationAction: enforce
+  severity: low
+  complianceType: musthave
+  upgradeApproval: Automatic
+  subscription:
+    channel: stable
+    name: vertical-pod-autoscaler
+    source: redhat-operators
+    sourceNamespace: openshift-marketplace
+    namespace: openshift-vertical-pod-autoscaler
